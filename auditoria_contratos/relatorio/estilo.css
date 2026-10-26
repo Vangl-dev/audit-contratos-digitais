@@ -67,17 +67,17 @@ body {
 .capa .responsavel strong { color: var(--tinta); font-weight: 700; font-size: 10.5pt; display: block; }
 .capa .responsavel img { max-height: 24mm; max-width: 55mm; margin-bottom: 5mm; display: block; }
 .capa .sobretitulo {
-  margin-top: 34mm; font-family: "Rotulo"; font-weight: 500; font-size: 9pt;
+  margin-top: 24mm; font-family: "Rotulo"; font-weight: 500; font-size: 9pt;
   letter-spacing: .14em; text-transform: uppercase; color: var(--destaque);
 }
 .capa h1 { font-size: 27pt; line-height: 1.15; margin: 3mm 0 0; font-weight: 700; letter-spacing: -.01em; }
 .capa .subtitulo { font-size: 12pt; color: var(--tinta-2); margin-top: 4mm; font-style: italic; }
-.capa .ficha { margin-top: 14mm; border-top: 1px solid var(--linha); }
+.capa .ficha { margin-top: 11mm; border-top: 1px solid var(--linha); }
 .capa .ficha div { display: flex; padding: 2.6mm 0; border-bottom: 1px solid var(--linha); gap: 6mm; }
 .capa .ficha dt { width: 38mm; flex: none; font: 500 8pt "Rotulo"; color: var(--tinta-3); text-transform: uppercase; letter-spacing: .06em; padding-top: .6mm; }
 .capa .ficha dd { margin: 0; font-size: 10pt; }
-.capa .resultado { margin-top: 12mm; }
-.capa .rodape-capa { position: absolute; left: 26mm; bottom: 20mm; font: 400 7.5pt "Rotulo"; color: var(--tinta-3); line-height: 1.5; max-width: 140mm; }
+.capa .resultado { margin-top: 10mm; }
+.capa .rodape-capa { margin-top: 8mm; font: 400 7.5pt "Rotulo"; color: var(--tinta-3); line-height: 1.5; max-width: 140mm; }
 
 .hash { font-family: "Codigo"; font-size: 8pt; word-break: break-all; letter-spacing: .01em; }
 
