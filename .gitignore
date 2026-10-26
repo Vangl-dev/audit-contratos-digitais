@@ -1,0 +1,18 @@
+# Ambiente
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Dados pessoais e de casos: nunca enviar ao GitHub
+perfil.yaml
+relatorios/
+casos/
+/*.pdf
+
+# Certificados locais
+confianca/adicionais/*
+!confianca/adicionais/LEIA-ME.txt
+confianca/icp-brasil-anterior-*/

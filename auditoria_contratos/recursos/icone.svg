@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#26466f"/>
+      <stop offset="1" stop-color="#162a44"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#fundo)"/>
+
+  <!-- folha -->
+  <path d="M132 92 H300 L364 156 V404 Q364 416 352 416 H132 Q120 416 120 404 V104 Q120 92 132 92 Z" fill="#ffffff"/>
+  <path d="M300 92 V144 Q300 156 312 156 H364 Z" fill="#d7dee8"/>
+
+  <!-- linhas de texto -->
+  <g stroke="#c3cdda" stroke-width="14" stroke-linecap="round">
+    <line x1="160" y1="150" x2="262" y2="150"/>
+    <line x1="160" y1="194" x2="326" y2="194"/>
+    <line x1="160" y1="238" x2="300" y2="238"/>
+    <line x1="160" y1="282" x2="236" y2="282"/>
+    <line x1="160" y1="326" x2="220" y2="326"/>
+  </g>
+
+  <!-- lupa -->
+  <line x1="372" y1="372" x2="430" y2="430" stroke="#dcaa48" stroke-width="34" stroke-linecap="round"/>
+  <circle cx="318" cy="318" r="74" fill="#16304f"/>
+  <circle cx="318" cy="318" r="74" fill="none" stroke="#dcaa48" stroke-width="20"/>
+  <path d="M286 320 L309 343 L352 296" fill="none" stroke="#dcaa48" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

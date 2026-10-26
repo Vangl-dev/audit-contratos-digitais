@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "audit-contratos-digitais"
+dynamic = ["version"]
+description = "Relatório técnico de integridade de contratos eletrônicos em PDF"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pyhanko>=0.38",
+    "pyhanko-certvalidator>=0.33",
+    "pikepdf>=10.0",
+    "pymupdf>=1.26",
+    "asn1crypto>=1.5",
+    "cryptography>=44",
+    "jinja2>=3.1",
+    "pyyaml>=6.0",
+    "weasyprint>=65",
+    "pillow>=11",
+    "pyside6>=6.8",
+]
+
+[project.optional-dependencies]
+testes = ["pytest>=8"]
+
+[project.scripts]
+auditoria-contratos = "auditoria_contratos.__main__:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "auditoria_contratos.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["auditoria_contratos*"]
+
+[tool.setuptools.package-data]
+auditoria_contratos = ["regras.yaml", "relatorio/*.j2", "relatorio/*.css", "relatorio/fontes/*", "recursos/*"]

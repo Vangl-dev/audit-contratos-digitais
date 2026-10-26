@@ -1,0 +1,407 @@
+# Catálogo de regras.
+#
+# Cada achado do relatório aponta para uma regra deste arquivo. O texto de
+# "explicacao" vai para o relatório como está: escrever para quem não é da
+# área técnica (juiz, parte, advogado da outra parte).
+#
+# Níveis: critico (vermelho), atencao (amarelo), info, ok, erro (não verificado).
+# Seções: documento, assinaturas, versoes, metadados, conteudo, hashes.
+
+DOC-01:
+  titulo: O arquivo não pôde ser lido como PDF
+  nivel: erro
+  secao: documento
+  explicacao: >
+    O arquivo não pôde ser aberto como um documento PDF válido. As verificações
+    que dependem da leitura da estrutura do PDF não foram realizadas.
+  recomendacao: Confirme se o arquivo está completo e se é de fato um PDF.
+
+ASS-01:
+  titulo: O conteúdo assinado não confere com a assinatura
+  nivel: critico
+  secao: assinaturas
+  explicacao: >
+    Toda assinatura digital guarda uma "impressão digital" (hash) do conteúdo
+    no momento em que foi feita. Recalculada agora, essa impressão digital não
+    é a mesma: os bytes cobertos pela assinatura foram modificados depois que
+    ela foi feita.
+  recomendacao: >
+    Requisitar à parte que apresentou o documento o arquivo original assinado,
+    em formato digital, para confronto.
+  referencias:
+    - "ISO 32000-1:2008, §12.8 (Assinaturas digitais)"
+    - "MP 2.200-2/2001, art. 10"
+
+ASS-02:
+  titulo: A assinatura é criptograficamente inválida
+  nivel: critico
+  secao: assinaturas
+  explicacao: >
+    O conteúdo coberto pela assinatura está intacto, mas a assinatura em si não
+    pôde ser confirmada com a chave pública do certificado apresentado. A
+    assinatura não comprova a autoria declarada.
+  referencias:
+    - "ISO 32000-1:2008, §12.8"
+    - "RFC 5652 (CMS)"
+
+ASS-03:
+  titulo: O documento foi alterado depois de assinado
+  nivel: critico
+  secao: assinaturas
+  explicacao: >
+    A assinatura está íntegra, mas cobre apenas uma versão anterior do arquivo.
+    Depois dela, o arquivo recebeu acréscimos que não se limitam a novas
+    assinaturas, carimbos do tempo ou preenchimento de campos permitidos. Ou
+    seja: o que se vê hoje ao abrir o arquivo não é, necessariamente, o que
+    foi assinado.
+  recomendacao: >
+    Comparar a versão assinada com a versão final. As páginas e trechos
+    alterados aparecem na seção "Histórico de versões".
+  referencias:
+    - "ISO 32000-1:2008, §7.5.6 (Atualizações incrementais) e §12.8.2.2 (DocMDP)"
+
+ASS-04:
+  titulo: Campos de formulário ou anotações foram alterados depois da assinatura
+  nivel: atencao
+  secao: assinaturas
+  explicacao: >
+    Depois da assinatura, o arquivo recebeu preenchimento de campos de
+    formulário ou anotações (comentários, carimbos, desenhos). Esse tipo de
+    acréscimo pode ser legítimo, mas altera o que é exibido ao abrir o arquivo.
+  referencias:
+    - "ISO 32000-1:2008, §12.8.2.2 (DocMDP)"
+
+ASS-05:
+  titulo: Assinatura íntegra e sem alterações posteriores
+  nivel: ok
+  secao: assinaturas
+  explicacao: >
+    O conteúdo coberto pela assinatura confere com a impressão digital (hash)
+    registrada nela, a assinatura é matematicamente válida e não há alterações
+    de conteúdo posteriores a ela.
+
+ASS-06:
+  titulo: A cadeia de certificação não foi confirmada
+  nivel: atencao
+  secao: assinaturas
+  explicacao: >
+    Não foi possível ligar o certificado do signatário a uma autoridade
+    certificadora raiz reconhecida (no caso brasileiro, a AC Raiz da
+    ICP-Brasil). Sem essa ligação, a assinatura prova que o conteúdo não mudou
+    desde que foi assinado, mas não prova quem assinou.
+  recomendacao: >
+    Verificar a assinatura também no Validador de Documentos Digitais do ITI
+    (validar.iti.gov.br).
+  referencias:
+    - "MP 2.200-2/2001, art. 10"
+    - "Lei 14.063/2020, art. 4º"
+
+ASS-07:
+  titulo: Certificado da ICP-Brasil
+  nivel: ok
+  secao: assinaturas
+  explicacao: >
+    O certificado usado na assinatura foi emitido no âmbito da Infraestrutura
+    de Chaves Públicas Brasileira (ICP-Brasil). Assinaturas qualificadas desse
+    tipo têm presunção de veracidade em relação ao signatário.
+  referencias:
+    - "MP 2.200-2/2001, art. 10, §1º"
+    - "Lei 14.063/2020, art. 4º, III"
+
+ASS-08:
+  titulo: Certificado de fora da ICP-Brasil
+  nivel: atencao
+  secao: assinaturas
+  explicacao: >
+    O certificado usado na assinatura não pertence à ICP-Brasil. Esse tipo de
+    assinatura só tem a validade de uma assinatura qualificada se for admitido
+    pelas partes como válido ou aceito por quem o documento for oposto.
+  referencias:
+    - "MP 2.200-2/2001, art. 10, §2º"
+    - "Lei 14.063/2020, art. 4º, I e II"
+
+ASS-09:
+  titulo: O certificado estava fora da validade na data da assinatura
+  nivel: atencao
+  secao: assinaturas
+  explicacao: >
+    A data da assinatura fica fora do período de validade do certificado
+    (antes do início ou depois do vencimento).
+  referencias:
+    - "RFC 5280, §4.1.2.5 (Validade do certificado)"
+
+ASS-10:
+  titulo: A data da assinatura foi informada pelo próprio computador do signatário
+  nivel: info
+  secao: assinaturas
+  explicacao: >
+    A assinatura não tem carimbo do tempo emitido por uma autoridade
+    independente. A data que aparece nela vem do relógio do computador que
+    assinou e pode ter sido ajustada.
+  referencias:
+    - "RFC 3161 (Carimbo do tempo)"
+
+ASS-11:
+  titulo: Assinatura com carimbo do tempo
+  nivel: ok
+  secao: assinaturas
+  explicacao: >
+    A assinatura tem carimbo do tempo emitido por uma autoridade de carimbo do
+    tempo, que atesta de forma independente que ela já existia naquela data.
+  referencias:
+    - "RFC 3161 (Carimbo do tempo)"
+
+ASS-12:
+  titulo: O arquivo não tem assinatura digital
+  nivel: atencao
+  secao: assinaturas
+  explicacao: >
+    O arquivo não contém nenhuma assinatura digital criptográfica embutida. Um
+    "aceite eletrônico" (clique, senha, SMS, selfie) feito em plataforma de
+    assinatura não fica gravado no PDF da mesma forma. Sem assinatura
+    embutida, não é possível, apenas pelo arquivo, confirmar que o conteúdo é
+    o mesmo que foi aceito. Essa prova depende dos registros da plataforma
+    (trilha de auditoria) e do arquivo original.
+  recomendacao: >
+    Requisitar a trilha de auditoria completa da plataforma e o arquivo
+    original, com o hash registrado no momento do aceite.
+  referencias:
+    - "Lei 14.063/2020, art. 4º"
+    - "MP 2.200-2/2001, art. 10, §2º"
+
+ASS-13:
+  titulo: A assinatura não pôde ser validada
+  nivel: erro
+  secao: assinaturas
+  explicacao: >
+    A assinatura foi encontrada, mas ocorreu um erro técnico ao validá-la. O
+    detalhe do erro está nas evidências.
+
+ASS-14:
+  titulo: O carimbo do tempo não foi confirmado
+  nivel: atencao
+  secao: assinaturas
+  explicacao: >
+    A assinatura tem um carimbo do tempo, mas ele não pôde ser confirmado
+    (está corrompido, não confere com a assinatura ou a autoridade emissora não
+    foi reconhecida).
+  referencias:
+    - "RFC 3161 (Carimbo do tempo)"
+
+VER-01:
+  titulo: O arquivo tem uma única versão
+  nivel: ok
+  secao: versoes
+  explicacao: >
+    O arquivo foi gravado de uma só vez, sem atualizações incrementais
+    posteriores.
+
+VER-02:
+  titulo: O arquivo foi salvo em mais de uma versão
+  nivel: info
+  secao: versoes
+  explicacao: >
+    O formato PDF permite acrescentar alterações ao final do arquivo sem
+    apagar o conteúdo anterior (atualização incremental). Cada acréscimo cria
+    uma nova versão, e as versões anteriores continuam recuperáveis. Isso é
+    normal quando há várias assinaturas, mas também é o caminho comum de
+    edições posteriores. As versões estão detalhadas no relatório.
+  referencias:
+    - "ISO 32000-1:2008, §7.5.6 (Atualizações incrementais)"
+
+VER-03:
+  titulo: O conteúdo visível mudou depois da assinatura
+  nivel: critico
+  secao: versoes
+  explicacao: >
+    Comparando a versão do arquivo que foi assinada com a versão final, página
+    por página, o conteúdo visível é diferente. As diferenças estão destacadas
+    nas imagens do relatório.
+  recomendacao: >
+    Considerar como conteúdo assinado apenas a versão assinada, que pode ser
+    extraída do próprio arquivo e tem o hash indicado no relatório.
+  referencias:
+    - "ISO 32000-1:2008, §7.5.6 e §12.8"
+
+VER-04:
+  titulo: O conteúdo visível mudou entre versões do arquivo
+  nivel: atencao
+  secao: versoes
+  explicacao: >
+    Uma versão posterior do arquivo mudou o que aparece nas páginas em
+    relação à versão anterior (texto, imagens ou elementos gráficos). Como
+    nenhuma assinatura cobre a versão anterior, não há como dizer, apenas pelo
+    arquivo, qual delas corresponde ao que foi contratado.
+  recomendacao: >
+    Comparar as versões destacadas no relatório e requisitar o arquivo
+    original à parte que o produziu.
+  referencias:
+    - "ISO 32000-1:2008, §7.5.6"
+
+VER-05:
+  titulo: Versões posteriores não mudaram o conteúdo visível
+  nivel: ok
+  secao: versoes
+  explicacao: >
+    As versões acrescentadas ao arquivo não mudaram o que aparece nas páginas.
+    Em geral são assinaturas, carimbos do tempo ou dados de validação.
+
+MET-01:
+  titulo: A data de modificação é anterior à data de criação
+  nivel: atencao
+  secao: metadados
+  explicacao: >
+    Os metadados registram que o arquivo foi modificado antes de ter sido
+    criado, o que é impossível em um fluxo normal. Isso indica que as datas
+    foram alteradas manualmente ou por um programa que regravou os metadados.
+  referencias:
+    - "ISO 32000-1:2008, §14.3.3 (Dicionário de informações)"
+
+MET-02:
+  titulo: Os dois registros de metadados do arquivo não batem
+  nivel: atencao
+  secao: metadados
+  explicacao: >
+    O PDF guarda os metadados em dois lugares (dicionário de informações e
+    XMP). Quando um programa edita o arquivo, costuma atualizar os dois. Aqui
+    eles divergem, o que indica que o arquivo passou por algum programa
+    depois de gerado.
+  referencias:
+    - "ISO 32000-1:2008, §14.3 (Metadados)"
+    - "ISO 16684-1 (XMP)"
+
+MET-03:
+  titulo: Os metadados registram um programa de edição de PDF
+  nivel: atencao
+  secao: metadados
+  explicacao: >
+    Os metadados indicam que o arquivo foi gravado por um programa ou serviço
+    usado para editar PDFs prontos. Isso não prova que o conteúdo foi
+    alterado, mas indica que o arquivo não saiu diretamente do sistema que o
+    gerou.
+
+MET-04:
+  titulo: Histórico de edições registrado no arquivo
+  nivel: info
+  secao: metadados
+  explicacao: >
+    Alguns programas registram dentro do arquivo cada vez que ele foi salvo,
+    com data e programa usado. Os registros encontrados estão listados.
+  referencias:
+    - "ISO 16684-1 (XMP), esquema xmpMM:History"
+
+MET-05:
+  titulo: O arquivo foi modificado depois de criado
+  nivel: info
+  secao: metadados
+  explicacao: >
+    As datas de criação e de modificação registradas nos metadados são
+    diferentes. Isso é comum (por exemplo, quando o arquivo é assinado), mas
+    indica a data da última gravação.
+
+CON-01:
+  titulo: O arquivo contém código JavaScript
+  nivel: atencao
+  secao: conteudo
+  explicacao: >
+    O arquivo contém programas (JavaScript) que podem ser executados pelo
+    leitor de PDF. Código desse tipo pode alterar o que é exibido na tela
+    conforme o programa usado para abrir o arquivo.
+
+CON-02:
+  titulo: O arquivo contém ações automáticas
+  nivel: atencao
+  secao: conteudo
+  explicacao: >
+    O arquivo contém ações que disparam sozinhas ou ao clicar: abrir outros
+    programas, enviar dados para a internet ou executar código.
+
+CON-03:
+  titulo: O arquivo tem outros arquivos anexados dentro dele
+  nivel: atencao
+  secao: conteudo
+  explicacao: >
+    Há arquivos guardados dentro do PDF, que não aparecem nas páginas. Podem
+    ser documentos legítimos (como a trilha de auditoria da plataforma de
+    assinatura) e devem ser examinados. A lista e o hash de cada um estão no
+    relatório.
+  referencias:
+    - "ISO 32000-1:2008, §7.11.4 (Arquivos incorporados)"
+
+CON-04:
+  titulo: O arquivo tem camadas ocultas
+  nivel: atencao
+  secao: conteudo
+  explicacao: >
+    O arquivo tem camadas de conteúdo que estão desligadas, ou seja, existem
+    no arquivo mas não aparecem na tela ou na impressão. Podem esconder
+    texto ou imagens.
+  referencias:
+    - "ISO 32000-1:2008, §8.11 (Conteúdo opcional)"
+
+CON-05:
+  titulo: O arquivo tem anotações ocultas
+  nivel: atencao
+  secao: conteudo
+  explicacao: >
+    Há anotações (campos, carimbos, comentários) marcadas para não aparecer
+    na tela.
+  referencias:
+    - "ISO 32000-1:2008, §12.5.3 (Sinalizadores de anotação)"
+
+CON-06:
+  titulo: O arquivo usa formulário XFA
+  nivel: info
+  secao: conteudo
+  explicacao: >
+    O arquivo usa um formato de formulário (XFA) que pode ser exibido de forma
+    diferente em cada leitor de PDF.
+
+CON-08:
+  titulo: Há texto escondido sob outro elemento
+  nivel: atencao
+  secao: conteudo
+  explicacao: >
+    Existe texto gravado na página sobre o qual foi desenhado, depois, um
+    retângulo preenchido ou uma imagem que o esconde. O texto continua dentro
+    do arquivo, mas não aparece na tela nem na impressão. Essa é a forma mais
+    comum de "apagar" um trecho de um PDF pronto e escrever outro por cima.
+    Também pode ocorrer em documentos montados com tarjas ou carimbos.
+  recomendacao: >
+    Conferir o texto encoberto listado nas evidências e compará-lo com o que
+    aparece na página.
+  referencias:
+    - "ISO 32000-1:2008, §8.2 (Modelo gráfico: ordem de pintura)"
+
+CON-07:
+  titulo: Páginas sem texto pesquisável
+  nivel: info
+  secao: conteudo
+  explicacao: >
+    Algumas páginas são apenas imagem (por exemplo, documento digitalizado ou
+    "impresso" como imagem). Nessas páginas a comparação de texto entre
+    versões não é possível, apenas a comparação visual.
+
+HSH-01:
+  titulo: Um hash citado no documento confere com o arquivo
+  nivel: ok
+  secao: hashes
+  explicacao: >
+    O texto do documento (por exemplo, a página de trilha de auditoria da
+    plataforma de assinatura) cita um hash que confere com o arquivo
+    analisado, com uma de suas versões ou com um arquivo anexado. Isso liga
+    o registro da plataforma a esse conteúdo específico.
+
+HSH-02:
+  titulo: Um hash citado no documento não confere com o arquivo
+  nivel: info
+  secao: hashes
+  explicacao: >
+    O texto do documento cita um hash que não confere com o arquivo
+    analisado nem com nenhuma de suas versões. Isso é comum: muitas
+    plataformas calculam o hash do arquivo original antes de acrescentar a
+    página de trilha de auditoria. Para confirmar, é preciso o arquivo
+    original da plataforma.
+  recomendacao: >
+    Requisitar o arquivo original cujo hash foi registrado pela plataforma e
+    conferir se o hash bate.

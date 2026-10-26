@@ -1,0 +1,213 @@
+/* Relatório técnico — impressão A4 (WeasyPrint) e leitura em navegador. */
+
+@font-face { font-family: "Texto"; src: url("fontes/NotoSerif-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Texto"; src: url("fontes/NotoSerif-Italic.ttf"); font-style: italic; }
+@font-face { font-family: "Texto"; src: url("fontes/NotoSerif-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "Rotulo"; src: url("fontes/NotoSans-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Rotulo"; src: url("fontes/NotoSans-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Rotulo"; src: url("fontes/NotoSans-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "Codigo"; src: url("fontes/NotoSansMono-Regular.ttf"); }
+
+:root {
+  --tinta: #1c2533;
+  --tinta-2: #4a5566;
+  --tinta-3: #6b7585;
+  --linha: #d9dde3;
+  --fundo-2: #f4f5f7;
+  --destaque: #1f3a5f;
+  --vermelho: #a8201a;
+  --vermelho-fundo: #fbeceb;
+  --amarelo: #8a5300;
+  --amarelo-fundo: #fdf3e1;
+  --verde: #1d6b3a;
+  --verde-fundo: #e8f4ec;
+  --cinza: #55606f;
+  --cinza-fundo: #eef0f3;
+}
+
+@page {
+  size: A4;
+  margin: 24mm 20mm 22mm 22mm;
+  @top-left {
+    font: 500 7.5pt "Rotulo"; color: #6b7585; letter-spacing: .04em; text-transform: uppercase;
+  }
+  @top-right {
+    font: 400 7.5pt "Rotulo"; color: #6b7585;
+  }
+  @bottom-left {
+    font: 400 6.5pt "Codigo"; color: #6b7585;
+  }
+  @bottom-right {
+    content: "Página " counter(page) " de " counter(pages);
+    font: 400 7.5pt "Rotulo"; color: #6b7585;
+  }
+}
+@page capa {
+  margin: 0;
+  @top-left { content: none; } @top-right { content: none; }
+  @bottom-left { content: none; } @bottom-right { content: none; }
+}
+
+* { box-sizing: border-box; }
+html { font-size: 10pt; }
+body {
+  margin: 0; color: var(--tinta); background: #fff;
+  font-family: "Texto", Georgia, serif; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* ——— Capa ——— */
+.capa {
+  page: capa; height: 297mm; padding: 26mm 24mm 20mm 26mm;
+  position: relative; break-after: page;
+  border-left: 7mm solid var(--destaque);
+}
+.capa .responsavel { font-family: "Rotulo"; color: var(--tinta-2); font-size: 9pt; line-height: 1.45; }
+.capa .responsavel strong { color: var(--tinta); font-weight: 700; font-size: 10.5pt; display: block; }
+.capa .responsavel img { max-height: 24mm; max-width: 55mm; margin-bottom: 5mm; display: block; }
+.capa .sobretitulo {
+  margin-top: 34mm; font-family: "Rotulo"; font-weight: 500; font-size: 9pt;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--destaque);
+}
+.capa h1 { font-size: 27pt; line-height: 1.15; margin: 3mm 0 0; font-weight: 700; letter-spacing: -.01em; }
+.capa .subtitulo { font-size: 12pt; color: var(--tinta-2); margin-top: 4mm; font-style: italic; }
+.capa .ficha { margin-top: 14mm; border-top: 1px solid var(--linha); }
+.capa .ficha div { display: flex; padding: 2.6mm 0; border-bottom: 1px solid var(--linha); gap: 6mm; }
+.capa .ficha dt { width: 38mm; flex: none; font: 500 8pt "Rotulo"; color: var(--tinta-3); text-transform: uppercase; letter-spacing: .06em; padding-top: .6mm; }
+.capa .ficha dd { margin: 0; font-size: 10pt; }
+.capa .resultado { margin-top: 12mm; }
+.capa .rodape-capa { position: absolute; left: 26mm; bottom: 20mm; font: 400 7.5pt "Rotulo"; color: var(--tinta-3); line-height: 1.5; max-width: 140mm; }
+
+.hash { font-family: "Codigo"; font-size: 8pt; word-break: break-all; letter-spacing: .01em; }
+
+/* ——— Selo de classificação ——— */
+.selo { display: flex; align-items: stretch; border-radius: 2mm; overflow: hidden; border: 1px solid; }
+.selo .cor { width: 34mm; flex: none; color: #fff; font: 700 13pt "Rotulo"; letter-spacing: .08em;
+  display: flex; align-items: center; justify-content: center; }
+.selo .texto { padding: 3.5mm 5mm; font-size: 10pt; }
+.selo .texto strong { display: block; font: 700 8pt "Rotulo"; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1mm; }
+.selo.VERMELHO { border-color: var(--vermelho); background: var(--vermelho-fundo); }
+.selo.VERMELHO .cor { background: var(--vermelho); }
+.selo.AMARELO { border-color: #c98a1c; background: var(--amarelo-fundo); }
+.selo.AMARELO .cor { background: #c07a0a; }
+.selo.VERDE { border-color: var(--verde); background: var(--verde-fundo); }
+.selo.VERDE .cor { background: var(--verde); }
+
+/* ——— Corpo ——— */
+h2 {
+  font: 700 14pt "Texto"; margin: 0 0 4mm; padding-bottom: 2mm; color: var(--tinta);
+  border-bottom: 1.5px solid var(--destaque); break-after: avoid;
+  bookmark-level: 1; bookmark-label: content();
+}
+h2 .num { color: var(--destaque); margin-right: 2.5mm; }
+h3 { font: 700 10.5pt "Rotulo"; margin: 6mm 0 2mm; color: var(--tinta); break-after: avoid; }
+section { margin-bottom: 10mm; }
+section.nova-pagina { break-before: page; }
+p { margin: 0 0 3mm; text-align: justify; hyphens: auto; }
+.nota { font-size: 8.5pt; color: var(--tinta-2); }
+.vazio { color: var(--tinta-3); font-style: italic; }
+
+table { width: 100%; border-collapse: collapse; margin: 1mm 0 4mm; font: 400 8.5pt/1.45 "Rotulo"; }
+th, td { text-align: left; vertical-align: top; padding: 1.8mm 2.2mm; border-bottom: 1px solid var(--linha); }
+th { font-weight: 500; color: var(--tinta-3); font-size: 7.5pt; text-transform: uppercase; letter-spacing: .05em; background: var(--fundo-2); }
+table.ficha th { width: 34%; background: none; text-transform: none; letter-spacing: 0; font-size: 8.5pt; color: var(--tinta-2); }
+tr { break-inside: avoid; }
+
+.chip { display: inline-block; font: 700 6.8pt "Rotulo"; letter-spacing: .06em; text-transform: uppercase;
+  padding: .5mm 2mm; border-radius: 1mm; white-space: nowrap; }
+.chip.critico { background: var(--vermelho); color: #fff; }
+.chip.atencao { background: #c07a0a; color: #fff; }
+.chip.erro { background: var(--cinza); color: #fff; }
+.chip.info { background: var(--cinza-fundo); color: var(--cinza); }
+.chip.ok { background: var(--verde-fundo); color: var(--verde); }
+.sim { color: var(--verde); font-weight: 500; }
+.nao { color: var(--vermelho); font-weight: 500; }
+
+/* Resumo */
+.lista-resumo { list-style: none; padding: 0; margin: 2mm 0 4mm; }
+.lista-resumo li { display: flex; gap: 3mm; padding: 2.2mm 0; border-bottom: 1px solid var(--linha); break-inside: avoid; }
+.lista-resumo li .chip { margin-top: .8mm; flex: none; align-self: flex-start; width: 23mm; text-align: center; }
+.lista-resumo .titulo-achado { font-weight: 700; }
+
+/* Achados */
+.achado { border: 1px solid var(--linha); border-left: 1.4mm solid var(--cinza); border-radius: 1mm;
+  padding: 3.5mm 4.5mm 2mm; margin-bottom: 4mm; break-inside: avoid; }
+.achado.critico { border-left-color: var(--vermelho); }
+.achado.atencao { border-left-color: #c07a0a; }
+.achado.ok { border-left-color: var(--verde); }
+.achado .cabeca { display: flex; justify-content: space-between; gap: 4mm; align-items: baseline; margin-bottom: 1.5mm; }
+.achado .cabeca .id { font: 500 7.5pt "Codigo"; color: var(--tinta-3); margin-right: 2mm; }
+.achado .cabeca .tit { font: 700 10pt "Rotulo"; }
+.achado .resumo { font-weight: 700; font-family: "Texto"; margin-bottom: 1.5mm; }
+.achado .rotulo { font: 500 7pt "Rotulo"; text-transform: uppercase; letter-spacing: .07em; color: var(--tinta-3); margin: 2.5mm 0 .8mm; }
+.achado table { margin-bottom: 1mm; }
+.achado .refs { font: 400 7.5pt "Rotulo"; color: var(--tinta-3); margin: 2mm 0 1mm; }
+
+/* Assinaturas */
+.cartao { border: 1px solid var(--linha); border-radius: 1.5mm; margin-bottom: 5mm; break-inside: avoid; }
+.cartao .topo { background: var(--fundo-2); padding: 2.5mm 4mm; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--linha); font-family: "Rotulo"; }
+.cartao .topo strong { font-size: 10pt; }
+.cartao table { margin: 0; }
+.cartao table th { padding-left: 4mm; }
+.verificacoes { display: flex; gap: 2mm; padding: 3mm 4mm; flex-wrap: wrap; border-bottom: 1px solid var(--linha); }
+.verificacoes .v { flex: 1 1 0; min-width: 0; border-radius: 1mm; padding: 2mm 2.5mm; font: 400 7.5pt/1.3 "Rotulo"; background: var(--fundo-2); }
+.verificacoes .v b { display: block; font-size: 8.5pt; margin-top: .6mm; }
+.verificacoes .v.bom { background: var(--verde-fundo); color: var(--verde); }
+.verificacoes .v.ruim { background: var(--vermelho-fundo); color: var(--vermelho); }
+.verificacoes .v.alerta { background: var(--amarelo-fundo); color: var(--amarelo); }
+
+/* Versões */
+.linha-tempo { border-left: 2px solid var(--linha); margin: 2mm 0 5mm 2mm; padding-left: 5mm; }
+.linha-tempo .item { position: relative; margin-bottom: 4mm; break-inside: avoid; }
+.linha-tempo .item::before { content: ""; position: absolute; left: -7.1mm; top: 1.2mm; width: 3.2mm; height: 3.2mm;
+  border-radius: 50%; background: #fff; border: 2px solid var(--destaque); }
+.linha-tempo .item.alerta::before { border-color: var(--vermelho); background: var(--vermelho); }
+.linha-tempo .item .t { font: 700 9.5pt "Rotulo"; }
+.linha-tempo .item .d { font: 400 8.5pt "Rotulo"; color: var(--tinta-2); }
+
+.comparacao { break-inside: avoid; margin: 3mm 0 6mm; }
+.comparacao .par { display: flex; gap: 4mm; }
+.comparacao figure { flex: 1 1 0; margin: 0; }
+.comparacao .par.detalhe { flex-direction: column; gap: 3mm; margin-bottom: 4mm; }
+.comparacao .par.detalhe img { width: auto; max-width: 100%; max-height: 70mm; }
+.comparacao img { width: 100%; border: 1px solid var(--linha); display: block; }
+.comparacao figcaption { font: 500 7.5pt "Rotulo"; color: var(--tinta-3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1.2mm; }
+.diff-texto { font: 400 8pt "Codigo"; margin: 2mm 0 0; padding: 0; list-style: none; }
+.diff-texto li { padding: .7mm 2mm; overflow-wrap: anywhere; }
+.diff-texto .mais { background: var(--verde-fundo); color: var(--verde); }
+.diff-texto .menos { background: var(--vermelho-fundo); color: var(--vermelho); text-decoration: line-through; }
+
+pre.comando { font: 400 8pt "Codigo"; background: var(--fundo-2); padding: 2.5mm 3mm; border-radius: 1mm;
+  white-space: pre-wrap; word-break: break-all; margin: 1mm 0 3mm; }
+
+.glossario dt { font: 700 9pt "Rotulo"; margin-top: 2.5mm; }
+.glossario dd { margin: .5mm 0 0; font-size: 9.5pt; }
+
+.assinatura-responsavel { margin-top: 18mm; break-inside: avoid; text-align: center; font-family: "Rotulo"; }
+.assinatura-responsavel .linha { width: 85mm; margin: 16mm auto 1.5mm; border-top: 1px solid var(--tinta); }
+.assinatura-responsavel .n { font-weight: 700; }
+.assinatura-responsavel .q { font-size: 8.5pt; color: var(--tinta-2); }
+
+@media screen {
+  body { background: #e9ebee; }
+  .folha { max-width: 210mm; margin: 8mm auto; background: #fff; padding: 18mm 20mm; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+  .capa { height: auto; min-height: 270mm; }
+}
+
+/* Conclusão */
+.conclusao .selo { margin-bottom: 6mm; }
+.manchete { font: 700 15pt/1.3 "Texto"; color: var(--tinta); margin: 0 0 4mm; text-align: left; hyphens: manual; }
+p.leigo { font-size: 11pt; line-height: 1.6; margin-bottom: 3.5mm; }
+.rotulo-bloco { font: 700 7.5pt "Rotulo"; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1.5mm; }
+.em-ordem { background: var(--verde-fundo); border-radius: 1.5mm; padding: 3.5mm 5mm 1mm; margin: 5mm 0 4mm; break-inside: avoid; }
+.em-ordem .rotulo-bloco { color: var(--verde); }
+.em-ordem p { font-size: 10pt; margin-bottom: 2mm; }
+.providencias { border: 1px solid var(--linha); border-radius: 1.5mm; padding: 3.5mm 5mm 1.5mm; margin: 4mm 0; break-inside: avoid; }
+.providencias .rotulo-bloco { color: var(--destaque); }
+.providencias ul { margin: 0 0 1mm; padding-left: 5mm; }
+.providencias li { font-size: 10pt; margin-bottom: 1.5mm; }
+.ressalva { margin-top: 5mm; border-top: 1px solid var(--linha); padding-top: 3mm; }
+h2.sem-numero { bookmark-level: 1; }
+.icone-programa { width: 4.2mm; height: 4.2mm; vertical-align: -1mm; margin-right: 1.5mm; }

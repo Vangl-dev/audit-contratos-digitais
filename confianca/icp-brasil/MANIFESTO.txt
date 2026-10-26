@@ -1,0 +1,18 @@
+Certificados da ICP-Brasil
+Baixado em: 2026-10-26T15:27:06-03:00
+Raízes: https://acraiz.icpbrasil.gov.br/credenciadas/RAIZ/ICP-Brasil<versão>.crt (HTTPS verificado)
+ACs intermediárias: http://acraiz.icpbrasil.gov.br/credenciadas/CertificadosAC-ICP-Brasil/ACcompactado.zip
+SHA-256 do pacote: 5e130117e7bd8d57f8c97172142945d280489f8c0ff7ceadbbce584e014cf675
+Intermediárias gravadas: 175
+
+Raízes (SHA-256 do certificado · válida até):
+  cbd8ed38d4a2d677d453d70dd8890af4f6374cba6299943f1ab3a6936c6fd795  Autoridade Certificadora Raiz Brasileira v1 · 2021-07-29
+  fb47d92a9909fd4fa9bec02737543e1f3514ced747407a8d9cfa397b0915067c  Autoridade Certificadora Raiz Brasileira v2 · 2023-06-21
+  f0c15afd258fb674e7a96e1a50ff873149364b9ec70d4d93c7a9f1eb6060d020  Autoridade Certificadora Raiz Brasileira v4 · 2035-04-23
+  caa53fc6091c6951887c976e378f6ef89aa6377c55d97b6475422b71ed7e9b17  Autoridade Certificadora Raiz Brasileira v5 · 2029-03-02
+  3bdb9b509352f1d3d71c2bf64d9a38a4e6cebda27809d77f7ac476cbde6e314a  Autoridade Certificadora Raiz Brasileira v6 · 2038-12-28
+  5657e70580eb678983f3ed7dfce091d84cae6549389a47fccda8d0e4dc2cf576  Autoridade Certificadora Raiz Brasileira v7 · 2038-12-28
+  6e0bff069a26994c15de2c4888cc54af84882e5495b7fbf66be9ccffec7489f6  Autoridade Certificadora Raiz Brasileira v10 · 2032-07-01
+  1406710058180fa4081aab3f246f1702429c552a11fa3143b84c88cb3ab8e5e7  Autoridade Certificadora Raiz Brasileira v11 · 2032-07-01
+  d8478e37ce19c690cf657381e68fe600e4e1a042536830f06847e03e554c4b01  Autoridade Certificadora Raiz Brasileira v12 · 2037-10-22
+  2b07d0bc02c4a6e0478ed22d0d99e8f97e1827b269097696a7feb6aad30c3ac8  Autoridade Certificadora Raiz Brasileira v13 · 2045-02-14

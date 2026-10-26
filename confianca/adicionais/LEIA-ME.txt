@@ -1,0 +1,6 @@
+Coloque aqui certificados raiz extras que devam ser reconhecidos como
+confiáveis (arquivos .crt, .cer, .pem ou .der), por exemplo a raiz de uma
+plataforma de assinatura que não seja da ICP-Brasil.
+
+Os arquivos desta pasta não vão para o GitHub. O relatório lista cada raiz
+usada, com o hash, para que a validação possa ser refeita.

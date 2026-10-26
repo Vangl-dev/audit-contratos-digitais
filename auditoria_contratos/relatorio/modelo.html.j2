@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relatório Técnico de Integridade Documental — {{ a.arquivo.nome }}</title>
+<meta name="author" content="{{ r.nome }}">
+<meta name="generator" content="audit-contratos-digitais {{ a.metodologia.versao_programa }}">
+<style>{{ css|safe }}</style>
+<style>
+  @page {
+    @top-left { content: "Relatório Técnico de Integridade Documental"; }
+    @top-right { content: "{{ a.arquivo.nome|css_texto }}"; }
+    @bottom-left { content: "SHA-256 do arquivo analisado: {{ a.arquivo.hashes.sha256 }}"; }
+  }
+</style>
+</head>
+<body>
+
+{# ════════════════ CAPA ════════════════ #}
+<div class="capa">
+  <div class="responsavel">
+    {% if r.logotipo %}<img src="{{ r.logotipo }}" alt="">{% endif %}
+    <strong>{{ r.nome }}</strong>
+    {{ r.qualificacao }}{% if r.registro %} · {{ r.registro }}{% endif %}
+    {% if r.escritorio %}<br>{{ r.escritorio }}{% endif %}
+    {% if r.email or r.telefone %}<br>{{ [r.email, r.telefone]|select|join(" · ") }}{% endif %}
+  </div>
+
+  <div class="sobretitulo">Relatório técnico</div>
+  <h1>Integridade Documental de Contrato Eletrônico</h1>
+  <div class="subtitulo">Verificação técnica de arquivo PDF: assinaturas digitais, versões, metadados e conteúdo</div>
+
+  <dl class="ficha">
+    {% if caso.processo %}<div><dt>Processo</dt><dd>{{ caso.processo }}</dd></div>{% endif %}
+    {% if caso.referencia %}<div><dt>Referência</dt><dd>{{ caso.referencia }}</dd></div>{% endif %}
+    <div><dt>Arquivo analisado</dt><dd>{{ a.arquivo.nome }}</dd></div>
+    <div><dt>Hash SHA-256</dt><dd class="hash">{{ a.arquivo.hashes.sha256 }}</dd></div>
+    <div><dt>Tamanho</dt><dd>{{ a.arquivo.tamanho|tamanho }}{% if a.arquivo.paginas %} · {{ a.arquivo.paginas }} página(s){% endif %}</dd></div>
+    <div><dt>Data da análise</dt><dd>{{ a.metodologia.data_analise|data }}</dd></div>
+  </dl>
+
+  <div class="resultado">
+    <div class="selo {{ a.classificacao.value }}">
+      <div class="cor">{{ a.classificacao.value }}</div>
+      <div class="texto"><strong>Conclusão</strong>{{ c.titulo }}</div>
+    </div>
+  </div>
+
+  <div class="rodape-capa">
+    Este relatório resulta de verificações automáticas, determinísticas e reproduzíveis sobre o arquivo
+    identificado acima pelo seu hash SHA-256. Qualquer pessoa pode refazê-las com o mesmo arquivo e obter
+    o mesmo resultado (seção {{ n.metodologia }}). Nenhuma conclusão foi produzida por inteligência
+    artificial. Este documento não é laudo pericial e não contém opinião jurídica.
+  </div>
+</div>
+
+{# ════════════════ 1. CONCLUSÃO ════════════════ #}
+<section class="conclusao">
+  <h2><span class="num">1</span>Conclusão</h2>
+  <div class="selo {{ a.classificacao.value }}">
+    <div class="cor">{{ a.classificacao.value }}</div>
+    <div class="texto"><strong>Classificação técnica</strong>{{ a.classificacao.descricao }}</div>
+  </div>
+
+  <p class="manchete">{{ c.titulo }}</p>
+  {% for f in c.frases %}<p class="leigo">{{ f }}</p>{% endfor %}
+  {% if c.positivos %}
+  <div class="em-ordem">
+    <div class="rotulo-bloco">O que está em ordem</div>
+    {% for f in c.positivos %}<p>{{ f }}</p>{% endfor %}
+  </div>
+  {% endif %}
+  {% if c.providencias %}
+  <div class="providencias">
+    <div class="rotulo-bloco">Providências sugeridas</div>
+    <ul>{% for p in c.providencias %}<li>{{ p }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+  <p class="nota ressalva">{{ c.ressalva }}</p>
+</section>
+
+<section class="nova-pagina">
+  <h2 class="sem-numero">Como se chegou a essa conclusão</h2>
+  <p>
+    O arquivo <em>{{ a.arquivo.nome }}</em> foi submetido a {{ total_regras }} verificações técnicas, agrupadas
+    em: assinaturas digitais, histórico de versões, metadados, conteúdo ativo ou oculto e hashes citados no
+    próprio documento.
+    {% if assinaturas_resumo %}{{ assinaturas_resumo }}{% endif %}
+    {% if a.versoes|length > 1 %}O arquivo contém {{ a.versoes|length }} versões gravadas umas sobre as outras.{% else %}O arquivo tem uma única versão.{% endif %}
+    Os pontos abaixo sustentam a conclusão; cada um é demonstrado na seção indicada.
+  </p>
+
+  {% if c.pontos %}
+  <h3>Pontos que levaram à conclusão</h3>
+  <ul class="lista-resumo">
+    {% for x in c.pontos %}
+    <li><span class="chip {{ x.nivel.value }}">{{ x.nivel.rotulo }}</span>
+      <div><span class="titulo-achado">{{ x.titulo }}.</span> {{ x.resumo }}
+        <span class="nota">[{{ x.regra }}{% if x.secao %} · seção {{ x.secao }}{% endif %}]</span></div></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Nenhuma verificação apontou ponto crítico ou de atenção.</p>
+  {% endif %}
+
+  {% if c.conformes %}
+  <h3>Verificações conformes</h3>
+  <ul class="lista-resumo">
+    {% for x in c.conformes %}
+    <li><span class="chip ok">Conforme</span><div><span class="titulo-achado">{{ x.titulo }}.</span> {{ x.resumo }}
+      <span class="nota">[{{ x.regra }}{% if x.secao %} · seção {{ x.secao }}{% endif %}]</span></div></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <p class="nota">Cada item remete a uma regra (código entre colchetes), explicada na seção {{ n.achados }} com as evidências que a sustentam.</p>
+</section>
+
+{# ════════════════ 2. ARQUIVO ════════════════ #}
+<section>
+  <h2><span class="num">2</span>Identificação do arquivo</h2>
+  <table class="ficha">
+    <tr><th>Nome do arquivo</th><td>{{ a.arquivo.nome }}</td></tr>
+    <tr><th>Tamanho</th><td>{{ a.arquivo.tamanho|tamanho }}</td></tr>
+    <tr><th>Páginas</th><td>{{ a.arquivo.paginas or "—" }}</td></tr>
+    <tr><th>Versão do formato PDF</th><td>{{ a.arquivo.versao_pdf or "—" }}</td></tr>
+    <tr><th>Hash SHA-256</th><td class="hash">{{ a.arquivo.hashes.sha256 }}</td></tr>
+    <tr><th>Hash SHA-512</th><td class="hash">{{ a.arquivo.hashes.sha512 }}</td></tr>
+  </table>
+  <p class="nota">
+    O hash é a "impressão digital" do arquivo: qualquer alteração, mesmo de um único caractere, produz um hash
+    completamente diferente. Se o hash de outra cópia for igual ao indicado acima, ela é idêntica ao arquivo
+    analisado. Como conferir: seção {{ n.metodologia }}.
+  </p>
+</section>
+
+{# ════════════════ 3. ASSINATURAS ════════════════ #}
+<section class="nova-pagina">
+  <h2><span class="num">3</span>Assinaturas digitais</h2>
+  {% if not a.assinaturas %}
+    <p>{{ (a.achados_da_secao("assinaturas")|first).resumo if a.achados_da_secao("assinaturas") else "Nenhuma assinatura digital foi encontrada." }}</p>
+    <p class="nota">{{ regras["ASS-12"].explicacao }}</p>
+  {% endif %}
+  {% for s in a.assinaturas %}
+  <div class="cartao">
+    <div class="topo"><strong>Assinatura {{ s.indice }} · {{ s.signatario }}</strong><span class="nota">campo “{{ s.campo }}” · versão {{ s.versao_assinada }}</span></div>
+    <div class="verificacoes">
+      <div class="v {{ 'bom' if s.integra else 'ruim' }}">Conteúdo assinado<b>{{ "Íntegro" if s.integra else "Alterado" }}</b></div>
+      <div class="v {{ 'bom' if s.valida else 'ruim' }}">Assinatura<b>{{ "Válida" if s.valida else "Inválida" }}</b></div>
+      <div class="v {{ 'bom' if s.modificacao in ('NONE', 'LTA_UPDATES') else ('ruim' if s.modificacao == 'OTHER' else 'alerta') }}">Alterações depois<b>{{ s.modificacao_texto|capitalize }}</b></div>
+      <div class="v {{ 'bom' if s.cadeia_icp else 'alerta' }}">ICP-Brasil<b>{{ "Sim" if (s.cadeia_icp or s.politica_icp) else "Não" }}</b></div>
+      <div class="v {{ 'bom' if s.carimbo and s.carimbo.integro and s.carimbo.valido else 'alerta' if s.carimbo else '' }}">Carimbo do tempo<b>{{ ("Presente" if s.carimbo.integro and s.carimbo.valido else "Não confirmado") if s.carimbo else "Ausente" }}</b></div>
+    </div>
+    <table class="ficha">
+      <tr><th>Signatário (certificado)</th><td>{{ s.signatario_completo }}</td></tr>
+      {% if s.cpf %}<tr><th>CPF no certificado</th><td>{{ s.cpf }}</td></tr>{% endif %}
+      {% if s.cnpj %}<tr><th>CNPJ no certificado</th><td>{{ s.cnpj }}</td></tr>{% endif %}
+      <tr><th>Autoridade emissora</th><td>{{ s.emissor }}</td></tr>
+      <tr><th>Cadeia de certificação</th><td>{% if s.cadeia %}{{ s.cadeia|join(" → ") }}{% else %}<span class="vazio">não confirmada</span>{% endif %}
+        {% if s.cadeia_confirmada %}<br><span class="nota">confirmada na {{ s.validado_em }}</span>{% endif %}</td></tr>
+      <tr><th>Validade do certificado</th><td>{{ s.validade_inicio|data }} a {{ s.validade_fim|data }}</td></tr>
+      <tr><th>Data declarada da assinatura</th><td>{{ s.data_declarada|data if s.data_declarada else "—" }}</td></tr>
+      {% if s.carimbo %}<tr><th>Carimbo do tempo</th><td>{{ s.carimbo.data|data }} · {{ s.carimbo.emissor }}</td></tr>{% endif %}
+      <tr><th>A assinatura cobre</th><td>{{ s.cobertura_texto }}</td></tr>
+      <tr><th>Faixa de bytes assinada</th><td class="hash">{{ s.byte_range|join(" ") }}</td></tr>
+      <tr><th>Formato e algoritmo</th><td>{{ s.formato }} · {{ (s.algoritmo_hash or "")|upper }}{% if s.mecanismo %} · {{ s.mecanismo }}{% endif %}</td></tr>
+      {% if s.motivo %}<tr><th>Motivo declarado</th><td>{{ s.motivo }}</td></tr>{% endif %}
+      {% if s.local %}<tr><th>Local declarado</th><td>{{ s.local }}</td></tr>{% endif %}
+      {% if s.politica_icp %}<tr><th>Política ICP-Brasil</th><td class="hash">{{ s.politica_icp|join(", ") }}</td></tr>{% endif %}
+    </table>
+  </div>
+  {% endfor %}
+  {% if a.assinaturas %}
+  <p class="nota">
+    Validação feita sem acesso à internet, com {{ a.metodologia.raizes_confianca|length }} certificado(s) raiz de confiança
+    (seção {{ n.metodologia }}). A situação de revogação dos certificados não foi consultada.
+  </p>
+  {% endif %}
+</section>
+
+{# ════════════════ 4. VERSÕES ════════════════ #}
+<section class="nova-pagina">
+  <h2><span class="num">4</span>Histórico de versões do arquivo</h2>
+  <p>
+    {{ regras["VER-02"].explicacao }}
+    Cada versão pode ser extraída do arquivo: basta copiar os primeiros bytes indicados na tabela (seção {{ n.metodologia }}).
+    {% if versoes_exportadas %}As versões extraídas acompanham este relatório na pasta <em>versoes</em>.{% endif %}
+  </p>
+  <table>
+    <tr><th>Versão</th><th>Tamanho (bytes)</th><th>Páginas</th><th>Assinatura</th><th>Hash SHA-256 da versão</th></tr>
+    {% for v in a.versoes %}
+    <tr>
+      <td>{{ v.numero }}{% if loop.last %} <span class="nota">(final)</span>{% endif %}</td>
+      <td>{{ "{:,}".format(v.tamanho).replace(",", ".") }}</td>
+      <td>{{ v.paginas or "—" }}</td>
+      <td>{{ v.assinaturas|join(", ") or "—" }}</td>
+      <td class="hash">{{ v.hashes.sha256 }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  {% if a.versoes|length > 1 %}
+  <h3>O que mudou em cada versão</h3>
+  <div class="linha-tempo">
+    {% for v in a.versoes %}
+    {% set m = v.mudancas %}
+    {% set mudou = m and (m.paginas_alteradas or m.paginas_acrescentadas or m.paginas_removidas) %}
+    <div class="item {{ 'alerta' if mudou and v.contexto != 'assinada' }}">
+      <div class="t">Versão {{ v.numero }}{% if v.assinaturas %} · {{ v.assinaturas|join(", ") }}{% endif %}</div>
+      <div class="d">
+        {% if v.numero == 1 %}Versão original do arquivo.
+        {% elif not v.abre_sozinha %}Esta versão não pôde ser aberta sozinha para comparação.
+        {% elif not mudou %}Nenhuma mudança no conteúdo visível em relação à versão {{ v.numero - 1 }}.
+        {% else %}
+          {% if m.paginas_alteradas %}Páginas com conteúdo visível alterado: {{ m.paginas_alteradas|map(attribute="pagina")|join(", ") }}.{% endif %}
+          {% if m.paginas_acrescentadas %} Páginas acrescentadas: {{ m.paginas_acrescentadas|join(", ") }}.{% endif %}
+          {% if m.paginas_removidas %} Páginas removidas: {{ m.paginas_removidas|join(", ") }}.{% endif %}
+          {% if v.contexto == "apos_assinatura" %}<strong>Mudança feita depois de assinatura anterior e não coberta por nenhuma assinatura.</strong>
+          {% elif v.contexto == "assinada" %}A mudança faz parte da versão assinada ({{ v.assinaturas|join(", ") }}).
+          {% else %}Nenhuma assinatura cobre esta mudança.{% endif %}
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% for v in a.versoes if v.mudancas %}
+    {% for p in v.mudancas.paginas_alteradas %}
+    <div class="comparacao">
+      <h3>Página {{ p.pagina }}: versão {{ v.numero - 1 }} × versão {{ v.numero }}</h3>
+      {% if p.detalhe_antes %}
+      <div class="par detalhe">
+        <figure><figcaption>Detalhe ampliado · antes</figcaption><img src="data:image/png;base64,{{ p.detalhe_antes }}" alt=""></figure>
+        <figure><figcaption>Detalhe ampliado · depois</figcaption><img src="data:image/png;base64,{{ p.detalhe_depois }}" alt=""></figure>
+      </div>
+      {% endif %}
+      {% if p.imagem_antes %}
+      <div class="par">
+        <figure><figcaption>Antes · versão {{ v.numero - 1 }}</figcaption><img src="data:image/png;base64,{{ p.imagem_antes }}" alt=""></figure>
+        <figure><figcaption>Depois · versão {{ v.numero }}</figcaption><img src="data:image/png;base64,{{ p.imagem_depois }}" alt=""></figure>
+      </div>
+      <p class="nota" style="margin-top:1.5mm">Em vermelho: {{ p.regioes }} região(ões) em que a imagem da página difere entre as duas versões.</p>
+      {% endif %}
+      {% if p.texto_mudou %}
+      <ul class="diff-texto">
+        {% for l in p.texto_removido %}<li class="menos">− {{ l }}</li>{% endfor %}
+        {% for l in p.texto_acrescentado %}<li class="mais">+ {{ l }}</li>{% endfor %}
+      </ul>
+      {% else %}
+      <p class="nota">O texto extraído da página é o mesmo nas duas versões: a diferença está em imagens, desenhos ou na posição dos elementos.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% endfor %}
+  {% endif %}
+</section>
+
+{# ════════════════ 5. METADADOS ════════════════ #}
+<section class="nova-pagina">
+  <h2><span class="num">5</span>Metadados</h2>
+  <p>Metadados são informações gravadas no arquivo pelos programas que o criaram ou editaram: datas, nome do programa, autor. Podem ser alterados com facilidade, por isso servem como indício, não como prova isolada.</p>
+  {% set md = a.metadados %}
+  {% set campos = (md.info.keys()|list + md.xmp.keys()|list)|unique|list if md else [] %}
+  {% if campos %}
+  <table>
+    <tr><th style="width:30%">Campo</th><th>Dicionário de informações (Info)</th><th>XMP</th></tr>
+    {% for c in campos %}
+    {% set eh_data = c in ("Criado em", "Modificado em", "Metadados alterados em") %}
+    <tr><td>{{ c }}</td>
+      <td>{% if c in md.info %}{{ md.info[c]|data_pdf if eh_data else md.info[c] }}{% else %}—{% endif %}</td>
+      <td>{% if c in md.xmp %}{{ md.xmp[c]|data if eh_data else md.xmp[c] }}{% else %}—{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="vazio">O arquivo não tem metadados.</p>{% endif %}
+  {% if md and md.historico %}
+  <h3>Histórico de gravação registrado no XMP</h3>
+  <table>
+    <tr><th>Ação</th><th>Data</th><th>Programa</th></tr>
+    {% for e in md.historico %}<tr><td>{{ e.acao or "—" }}</td><td>{{ e.data or "—" }}</td><td>{{ e.programa or "—" }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+</section>
+
+{# ════════════════ 6. CONTEÚDO ════════════════ #}
+<section>
+  <h2><span class="num">6</span>Conteúdo ativo, oculto e anexos</h2>
+  {% set c = a.conteudo %}
+  <table class="ficha">
+    <tr><th>Código JavaScript</th><td>{{ c.javascript|length ~ " ponto(s)" if c.javascript else "não encontrado" }}</td></tr>
+    <tr><th>Ações automáticas</th><td>{{ c.acoes|map(attribute="efeito")|unique|join("; ") if c.acoes else "não encontradas" }}</td></tr>
+    <tr><th>Arquivos anexados</th><td>{{ c.anexos|length if c.anexos else "nenhum" }}</td></tr>
+    <tr><th>Camadas ocultas</th><td>{{ c.camadas_ocultas|join(", ") if c.camadas_ocultas else "nenhuma" }}</td></tr>
+    <tr><th>Anotações ocultas</th><td>{{ c.anotacoes_ocultas|length if c.anotacoes_ocultas else "nenhuma" }}</td></tr>
+    <tr><th>Formulário XFA</th><td>{{ "sim" if c.xfa else "não" }}</td></tr>
+    <tr><th>Texto escondido sob outro elemento</th><td>{{ (c.texto_coberto|length ~ " trecho(s)") if c.texto_coberto else "não encontrado" }}</td></tr>
+    <tr><th>Páginas só com imagem</th><td>{{ c.paginas_sem_texto|join(", ") if c.paginas_sem_texto else "nenhuma" }}</td></tr>
+  </table>
+  {% if c.texto_coberto %}
+  <h3>Texto escondido sob outro elemento</h3>
+  <p class="nota">Texto que existe no arquivo mas foi coberto por um elemento desenhado depois dele, e por isso não aparece na página.</p>
+  <table>
+    <tr><th>Pág.</th><th>Texto encoberto</th><th>Coberto por</th></tr>
+    {% for t in c.texto_coberto %}<tr><td>{{ t.pagina }}</td><td><strong>{{ t.texto }}</strong></td><td>{{ t.coberto_por }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+  {% if c.anexos %}
+  <h3>Arquivos anexados</h3>
+  <table>
+    <tr><th>Nome</th><th>Tamanho</th><th>Hash SHA-256</th></tr>
+    {% for x in c.anexos %}<tr><td>{{ x.nome }}</td><td>{{ x.tamanho|tamanho }}</td><td class="hash">{{ x.hashes.sha256 }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+</section>
+
+{# ════════════════ 7. HASHES CITADOS ════════════════ #}
+<section>
+  <h2><span class="num">7</span>Hashes citados no documento</h2>
+  <p>Plataformas de assinatura costumam imprimir, na página de trilha de auditoria, o hash do documento que foi assinado. Todos os valores com formato de hash encontrados no texto foram conferidos com o arquivo, com cada versão e com os anexos.</p>
+  {% if a.hashes_citados %}
+  <table>
+    <tr><th>Pág.</th><th>Hash citado</th><th>Confere com</th></tr>
+    {% for h in a.hashes_citados %}
+    <tr><td>{{ h.pagina }}</td>
+      <td><span class="hash">{{ h.valor }}</span>{% if h.contexto %}<br><span class="nota">após: “{{ h.contexto }}”</span>{% endif %}</td>
+      <td>{% if h.confere_com %}<span class="sim">{{ h.confere_com|capitalize }} ({{ h.algoritmo }})</span>{% else %}<span class="nao">Nenhuma versão nem anexo</span>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="vazio">Nenhum valor com formato de hash foi encontrado no texto do documento.</p>{% endif %}
+</section>
+
+{# ════════════════ 8. ACHADOS ════════════════ #}
+<section class="nova-pagina">
+  <h2><span class="num">{{ n.achados }}</span>Achados detalhados</h2>
+  <p>Cada achado indica a regra aplicada, o resultado, o que ele significa e as evidências objetivas extraídas do arquivo.</p>
+  {% for x in a.achados %}
+  <div class="achado {{ x.nivel.value }}">
+    <div class="cabeca"><div><span class="id">{{ x.regra.id }}</span><span class="tit">{{ x.regra.titulo }}</span></div><span class="chip {{ x.nivel.value }}">{{ x.nivel.rotulo }}</span></div>
+    <div class="resumo">{{ x.resumo }}</div>
+    <div class="rotulo">O que significa</div>
+    <p>{{ x.regra.explicacao }}</p>
+    {% if x.evidencias %}
+    <div class="rotulo">Evidências</div>
+    <table class="ficha">
+      {% for k, v in x.evidencias.items() if v is not none %}
+      <tr><th>{{ k }}</th><td{% if v is string and v|length > 60 and " " not in v %} class="hash"{% endif %}>{{ v|evidencia }}</td></tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+    {% if x.regra.recomendacao and x.nivel in (N.CRITICO, N.ATENCAO, N.INFO) %}
+    <div class="rotulo">Providência sugerida</div><p>{{ x.regra.recomendacao }}</p>
+    {% endif %}
+    {% if x.regra.referencias %}<div class="refs">Referências: {{ x.regra.referencias|join(" · ") }}</div>{% endif %}
+  </div>
+  {% endfor %}
+</section>
+
+{# ════════════════ 9. METODOLOGIA ════════════════ #}
+<section class="nova-pagina">
+  <h2><span class="num">{{ n.metodologia }}</span>Metodologia e reprodutibilidade</h2>
+  <p>Todas as verificações são determinísticas: aplicam regras fixas, documentadas no catálogo de regras do programa, sobre os bytes do arquivo. O mesmo arquivo analisado pela mesma versão do programa produz sempre o mesmo resultado.</p>
+  <table class="ficha">
+    <tr><th>Programa</th><td><img class="icone-programa" src="{{ icone }}" alt="">{{ a.metodologia.programa }} {{ a.metodologia.versao_programa }} (código aberto)</td></tr>
+    <tr><th>Data e hora da análise</th><td>{{ a.metodologia.data_analise|data }}</td></tr>
+    <tr><th>Ambiente</th><td>Python {{ a.metodologia.python }} · {{ a.metodologia.sistema }}</td></tr>
+    <tr><th>Bibliotecas</th><td>{% for b, v in a.metodologia.bibliotecas.items() %}{{ b }} {{ v }}{{ ", " if not loop.last }}{% endfor %}</td></tr>
+    <tr><th>Consulta de revogação</th><td>Não realizada (análise sem acesso à internet)</td></tr>
+  </table>
+
+  <h3>Como conferir o hash do arquivo</h3>
+  <p class="nota">Windows (Prompt de Comando):</p>
+  <pre class="comando">certutil -hashfile "{{ a.arquivo.nome }}" SHA256</pre>
+  <p class="nota">Linux / macOS (Terminal):</p>
+  <pre class="comando">sha256sum "{{ a.arquivo.nome }}"        # Linux
+shasum -a 256 "{{ a.arquivo.nome }}"    # macOS</pre>
+  <p class="nota">O resultado deve ser: <span class="hash">{{ a.arquivo.hashes.sha256 }}</span></p>
+
+  {% if a.versoes|length > 1 %}
+  <h3>Como extrair uma versão anterior</h3>
+  <p class="nota">Cada versão é o início do arquivo até o tamanho indicado na seção 4. Exemplo para a versão {{ a.versoes[-2].numero }} ({{ a.versoes[-2].tamanho }} bytes):</p>
+  <pre class="comando">head -c {{ a.versoes[-2].tamanho }} "{{ a.arquivo.nome }}" > versao-{{ a.versoes[-2].numero }}.pdf    # Linux / macOS
+# Windows (PowerShell):
+$b = [IO.File]::ReadAllBytes("{{ a.arquivo.nome }}"); [IO.File]::WriteAllBytes("versao-{{ a.versoes[-2].numero }}.pdf", $b[0..{{ a.versoes[-2].tamanho - 1 }}])</pre>
+  <p class="nota">O hash SHA-256 do arquivo extraído deve ser igual ao da tabela de versões.</p>
+  {% endif %}
+
+  <h3>Certificados raiz de confiança usados</h3>
+  {% if a.metodologia.raizes_confianca %}
+  <table>
+    <tr><th>Certificado raiz</th><th>Válido até</th><th>SHA-256 do certificado</th></tr>
+    {% for c in a.metodologia.raizes_confianca %}<tr><td>{{ c.nome }}</td><td>{{ c.validade|data }}</td><td class="hash">{{ c.sha256 }}</td></tr>{% endfor %}
+  </table>
+  <p class="nota">Além das raízes, {{ a.metodologia.intermediarios_confianca }} certificados de autoridades intermediárias foram usados para completar as cadeias. {% if a.metodologia.raizes_confianca|selectattr("icp_brasil")|list %}Os certificados da ICP-Brasil foram obtidos do repositório do ITI (acraiz.icpbrasil.gov.br).{% endif %}</p>
+  {% else %}
+  <p class="vazio">Nenhum certificado raiz estava instalado. A cadeia de certificação das assinaturas não pôde ser confirmada.</p>
+  {% endif %}
+</section>
+
+{# ════════════════ 10. LIMITAÇÕES ════════════════ #}
+<section>
+  <h2><span class="num">{{ n.limitacoes }}</span>Limitações</h2>
+  <ul>
+    <li><p>A análise se limita ao arquivo identificado pelo hash indicado. Não foram examinados sistemas, servidores, bancos de dados ou registros de plataformas de assinatura.</p></li>
+    <li><p>A ausência de achados não prova que o documento seja autêntico; apenas que as verificações realizadas não encontraram inconsistências.</p></li>
+    <li><p>Um "aceite eletrônico" feito em plataforma (clique, senha, SMS, selfie) não fica gravado no arquivo da mesma forma que uma assinatura digital. A prova desse aceite depende dos registros da plataforma.</p></li>
+    <li><p>A situação de revogação dos certificados (se foram cancelados antes da assinatura) não foi consultada. Ela pode ser verificada no Validador de Documentos Digitais do ITI (validar.iti.gov.br).</p></li>
+    <li><p>Metadados podem ser alterados com facilidade e servem como indício, não como prova isolada.</p></li>
+    <li><p>Este relatório não é laudo pericial, não substitui perícia oficial e não contém opinião jurídica.</p></li>
+  </ul>
+</section>
+
+{# ════════════════ 11. GLOSSÁRIO ════════════════ #}
+<section>
+  <h2><span class="num">{{ n.glossario }}</span>Glossário</h2>
+  <dl class="glossario">
+    <dt>Hash (resumo criptográfico)</dt><dd>Sequência de letras e números calculada a partir do conteúdo do arquivo. Funciona como impressão digital: qualquer alteração muda o hash.</dd>
+    <dt>Assinatura digital</dt><dd>Assinatura feita com certificado digital e criptografia, embutida no arquivo. Registra o hash do conteúdo no momento da assinatura, o que permite detectar alterações posteriores.</dd>
+    <dt>Assinatura eletrônica</dt><dd>Termo mais amplo (Lei 14.063/2020): inclui aceites por clique, senha, SMS ou biometria em plataformas, que não necessariamente ficam gravados no arquivo.</dd>
+    <dt>Certificado digital</dt><dd>Documento eletrônico que liga uma pessoa a uma chave criptográfica, emitido por uma autoridade certificadora.</dd>
+    <dt>ICP-Brasil</dt><dd>Infraestrutura de Chaves Públicas Brasileira (MP 2.200-2/2001), mantida pelo ITI. Certificados emitidos nela geram assinaturas com presunção de veracidade.</dd>
+    <dt>Cadeia de certificação</dt><dd>Sequência de certificados que liga o certificado do signatário até uma autoridade certificadora raiz.</dd>
+    <dt>Carimbo do tempo</dt><dd>Atestado emitido por uma autoridade independente de que um dado existia em determinada data e hora.</dd>
+    <dt>Versão (atualização incremental)</dt><dd>Acréscimo gravado ao final do PDF sem apagar o conteúdo anterior. A versão anterior continua recuperável dentro do arquivo.</dd>
+    <dt>Faixa de bytes assinada (ByteRange)</dt><dd>Trecho exato do arquivo coberto por uma assinatura digital.</dd>
+    <dt>Metadados (Info e XMP)</dt><dd>Informações sobre o arquivo (datas, programas, autor) gravadas em dois registros diferentes dentro do PDF.</dd>
+  </dl>
+</section>
+
+<div class="assinatura-responsavel">
+  {{ r.cidade ~ ", " if r.cidade }}{{ a.metodologia.data_analise|data_extenso }}.
+  <div class="linha"></div>
+  <div class="n">{{ r.nome }}</div>
+  <div class="q">{{ r.qualificacao }}{% if r.registro %} · {{ r.registro }}{% endif %}</div>
+</div>
+</body>
+</html>

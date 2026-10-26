@@ -1,0 +1,16 @@
+# Copie este arquivo para "perfil.yaml" e preencha com os seus dados.
+# O perfil.yaml não vai para o GitHub (está no .gitignore).
+
+responsavel:
+  nome: "Nome Completo"
+  qualificacao: "Advogada"
+  registro: "OAB/SP 000.000"
+  escritorio: ""          # opcional
+  email: ""               # opcional
+  telefone: ""            # opcional
+  cidade: "São Paulo"     # usada na linha de assinatura
+  logotipo: ""            # opcional: caminho de uma imagem PNG ou SVG
+
+relatorio:
+  # Mostrar CPF dos signatários mascarado (***.456.789-**). Recomendado (LGPD).
+  mascarar_documentos: true
